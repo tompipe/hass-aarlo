@@ -7,6 +7,7 @@ https://www.home-assistant.io/integrations/camera
 """
 from __future__ import annotations
 
+import time
 import asyncio
 import base64
 import logging
@@ -26,8 +27,8 @@ from homeassistant.components.camera import (
     Camera,
     CameraEntityFeature,
     DOMAIN as CAMERA_DOMAIN,
-    SERVICE_RECORD,
-    StreamType
+    SERVICE_RECORD
+
 )
 from homeassistant.components.ffmpeg import DATA_FFMPEG
 from homeassistant.const import (
@@ -70,6 +71,9 @@ from .const import (
     CONF_ADD_AARLO_PREFIX,
     CONF_SAVE_UPDATES_TO,
     CONF_STREAM_SNAPSHOT,
+    CONF_SAVE_MEDIA_TO,
+    CONF_AUTO_RECORD,
+    CONF_AUTO_RECORD_DURATION,
     STATE_ALARM_ARLO_ARMED,
     STATE_ALARM_ARLO_DISARMED,
 )
@@ -313,6 +317,9 @@ class ArloCam(Camera):
         self._last_image_source = None
         self._stream_snapshot = aarlo_config.get(CONF_STREAM_SNAPSHOT)
         self._save_updates_to = aarlo_config.get(CONF_SAVE_UPDATES_TO)
+        self._save_media_to = aarlo_config.get(CONF_SAVE_MEDIA_TO)
+        self._auto_record = aarlo_config.get(CONF_AUTO_RECORD, False)
+        self._auto_record_duration = aarlo_config.get(CONF_AUTO_RECORD_DURATION, 30)
         self._ffmpeg = hass.data[DATA_FFMPEG]
 
         self._attr_name = camera.name
@@ -323,7 +330,6 @@ class ArloCam(Camera):
 
         self._attr_brand = COMPONENT_BRAND
         # removed for issue #1019
-        # self._attr_frontend_stream_type = StreamType.HLS
         self._attr_is_on = camera.is_on
         self._attr_model = camera.model_id
         self._attr_should_poll = False
@@ -349,6 +355,16 @@ class ArloCam(Camera):
                     self._state = CameraState.STREAMING
                     self._attr_is_streaming = True
                 elif value == "alertStreamActive":
+                    if self._auto_record and self._save_media_to != "":
+                        filename = "{}/{}_{}.mp4".format(self._save_media_to, self._attr_unique_id, int(time.time()))
+                        _LOGGER.info(f"{self._attr_unique_id} auto recording to {filename}")
+                        data = {
+                            "entity_id": self.entity_id,
+                            CONF_FILENAME: filename,
+                            CONF_DURATION: self._auto_record_duration,
+                            CONF_LOOKBACK: 0,
+                        }
+                        self.hass.services.call(CAMERA_DOMAIN, SERVICE_RECORD, data, blocking=False)
                     self._state = CameraState.RECORDING
                     self._attr_is_recording = True
                 elif value == "unavailable":

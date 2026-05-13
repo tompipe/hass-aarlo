@@ -62,6 +62,7 @@ from pyaarlo.constant import (
 )
 
 from .const import *
+from .const import CONF_AUTO_RECORD, AUTO_RECORD_DEFAULT, CONF_AUTO_RECORD_DURATION, AUTO_RECORD_DURATION_DEFAULT
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -122,6 +123,8 @@ AARLO_SCHEMA = vol.Schema({
     vol.Optional(CONF_SAVE_UPDATES_TO, default=SAVE_UPDATES_TO): cv.string,
     vol.Optional(CONF_USER_STREAM_DELAY, default=USER_STREAM_DELAY): cv.positive_int,
     vol.Optional(CONF_SAVE_MEDIA_TO, default=SAVE_MEDIA_TO): cv.string,
+    vol.Optional(CONF_AUTO_RECORD, default=AUTO_RECORD_DEFAULT): cv.boolean,
+    vol.Optional(CONF_AUTO_RECORD_DURATION, default=AUTO_RECORD_DURATION_DEFAULT): cv.positive_int,
     vol.Optional(CONF_NO_UNICODE_SQUASH, default=NO_UNICODE_SQUASH): cv.boolean,
     vol.Optional(CONF_SAVE_SESSION, default=SAVE_SESSION): cv.boolean,
     vol.Optional(CONF_BACKEND, default=DEFAULT_BACKEND): cv.string,
