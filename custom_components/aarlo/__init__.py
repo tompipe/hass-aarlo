@@ -10,7 +10,7 @@ import logging
 import pprint
 import time
 import voluptuous as vol
-from traceback import extract_stack
+from traceback import extract_stack  # noqa: F401
 from requests.exceptions import ConnectTimeout, HTTPError
 
 from homeassistant.components import persistent_notification
@@ -50,6 +50,7 @@ from pyaarlo.constant import (
 )
 
 from .const import *
+from .const import CONF_AUTO_RECORD, AUTO_RECORD_DEFAULT, CONF_AUTO_RECORD_DURATION, AUTO_RECORD_DURATION_DEFAULT
 from .utils import get_entity_from_domain
 from .cfg import BlendedCfg, PyaarloCfg
 
@@ -125,6 +126,8 @@ CONFIG_SCHEMA = vol.Schema(
                     CONF_USER_STREAM_DELAY, default=USER_STREAM_DELAY
                 ): cv.positive_int,
                 vol.Optional(CONF_SAVE_MEDIA_TO, default=SAVE_MEDIA_TO): cv.string,
+                vol.Optional(CONF_AUTO_RECORD, default=AUTO_RECORD_DEFAULT): cv.boolean,
+                vol.Optional(CONF_AUTO_RECORD_DURATION, default=AUTO_RECORD_DURATION_DEFAULT): cv.positive_int,
                 vol.Optional(
                     CONF_NO_UNICODE_SQUASH, default=NO_UNICODE_SQUASH
                 ): cv.boolean,

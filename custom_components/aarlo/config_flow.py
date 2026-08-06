@@ -329,5 +329,10 @@ class ArloOptionsFlowHandler(config_entries.OptionsFlow):
                              default=options.get("switch_snapshot_timeout", 15)): int,
                 vol.Required("switch_doorbell_silence",
                              default=options.get("switch_doorbell_silence", True)): bool,
+                vol.Optional("save_media_to", default=options.get("save_media_to", "")): str,
+                vol.Optional("auto_record",
+                             default=options.get("auto_record", False)): bool,
+                vol.Optional("auto_record_duration",
+                             default=options.get("auto_record_duration", 30)): int,
             })
         )
